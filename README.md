@@ -8,6 +8,7 @@ Povezava na podatkovno bazo je na MongoDB cloud cluster z začasnim uporabnikom,
 Spletno stran zaženeš z ukazoma:
 
 npm install
+
 npm start
 
 http://localhost:3000/
