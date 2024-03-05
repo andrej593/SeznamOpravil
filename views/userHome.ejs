@@ -1,0 +1,280 @@
+<%- include("layoutTop.ejs"); %>
+<div class="container">
+   <a class="btn btn-success m-1" data-bs-toggle="collapse" data-bs-target="#addList">Add list</a>
+   <div class="row justify-content-center collapse" id="addList">
+      <div class="col text-black">
+         <div class="card">
+            <div class="card-body">
+               <form class="form-horizontal addList" id="" method="" action="">
+                  <div class="form-group">
+                     <label for="listName" class="control-label">List name</label>
+                     <input type="text" class="form-control" name="listName" id="listName" placeholder="ListName"/>
+                  </div>
+                  <div class="form-group">
+                     <label for="listDesc" class="control-label">Description</label>
+                     <textarea class="form-control" name="listDesc" id="listDesc" placeholder="This is list description."></textarea>
+                  </div>
+                  <div class="form-group">
+                     <label for="listListOfTags" class="control-label">Tags</label>
+                     <div class="tags">
+                        <input type="text" class="form-control" name="listListOfTags[]" id="listListOfTags" placeholder="Tag"/>
+                     </div>
+                     <a class="btn btn-success btn-sm m-1" onclick="addTagFormL(this)">Add tag</a>
+                  </div>
+                  <div class="form-group">
+                     <p>Tasks</p>
+                     <div class="tasks justify-content-center align-items-center">
+                        <div class="form-group card card-body">
+                           <div class="form-group">
+                              <label for="taskName" class="control-label">Task name</label>
+                              <input type="text" class="form-control" name="taskName[]" id="taskName" placeholder="Task"/>
+                           </div>
+                           <div class="form-group">
+                              <label for="taskDesc" class="control-label">Description</label>
+                              <textarea class="form-control" name="taskDesc[]" id="taskDesc" placeholder="This is task description."></textarea>
+                           </div>
+                           <div class="form-group">
+                              <label for="taskDateWarn" class="control-label">Warning date</label>
+                              <input type="datetime-local" class="form-control" name="taskDateWarn[]" id="taskDateWarn">
+                           </div>
+                           <div class="form-group">
+                              <label for="taskDateEnd" class="control-label">Expiration date</label>
+                              <input type="datetime-local" class="form-control" name="taskDateEnd[]" id="taskDateEnd">
+                           </div>
+                           <div class="form-group">
+                              <label for="taskListOfTags" class="control-label">Tags</label>
+                              <div class="tags">
+                                 <input type="text" class="form-control" name="taskListOfTags[][0]" id="taskListOfTags" placeholder="Tag"/>
+                              </div>
+                              <a class="btn btn-success btn-sm m-1" onclick="addTagFormLT(this,0)">Add tag</a>
+                           </div>
+                        </div>
+                     </div>
+                     <a class="btn btn-success btn-sm m-1" onclick="addTaskForm(this)">Add Task</a>
+                  </div>
+                  <div class="form-group ">
+                     <button type="submit" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#addList">Add</button>
+                     <a class="btn btn-danger" data-bs-toggle="collapse" data-bs-target="#addList">Cancel</a>
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+   </div>
+   <ul class="list-group">
+      <% lists.forEach(function(list){ %>
+      <li class="list-group-item <% if(list.listStatus){ %>text-decoration-line-through<% } %>">
+         <div class="card bg-light text-black">
+            <div class="card-body">
+               <div class="card-title">
+                  <div class="row">
+                     <div class="col-2">
+                        <h3><%= list.listName %></h3>
+                     </div>
+                     <div class="col tagList">
+                        <% list.listListOfTags.forEach(function(tag){ %>
+                        <span class="badge rounded-pill bg-primary m-1 fs-5"><%= tag.tag %><a class="btn btn-danger btn-sm" id="<%= list._id %>,<%= tag._id %>" onclick="rmTagFromList(this)"><i class="fas fa-remove"></i></a></span>
+                        <% }); %>
+                     </div>
+                     <div class="col-4 d-flex justify-content-end align-items-center">
+                        <div class="input-group m-1">
+                           <input type="text" class="form-control" placeholder="NewTag" id="listNewTag">
+                           <button class="btn btn-primary" type="button" id="<%= list._id %>" onclick="addTagToList(this)"><span class="fas fa-plus"></span></button>
+                        </div>
+                        <a class="btn btn-secondary m-1" onclick="toggleIcon(this)" data-bs-toggle="collapse" data-bs-target="#collapseTasks_<%= list._id %>">
+                        <span class="fas fa-arrow-circle-down"></span>
+                        </a>
+                        <a class="btn btn-success m-1" data-bs-toggle="collapse" data-bs-target="#edit_<%= list._id %>">
+                        <span class="fas fa-edit"></span>
+                        </a>
+                        <% if(!list.listStatus){ %>
+                        <a class="btn btn-danger m-1 changeStatus" id="<%= list._id %>" onclick="changeStatusL(this)">
+                        <span class="fas fa-square"></span>
+                        </a>
+                        <% }else{ %>
+                        <a class="btn btn-success m-1 changeStatus" id="<%= list._id %>" onclick="changeStatusL(this)">
+                        <span class="fas fa-check-square"></span>
+                        </a>
+                        <% } %>
+                        <a class="btn btn-danger m-1" id="<%= list._id %>" onclick="removeList(this)">
+                        <span class="fas fa-remove"></span>
+                        </a>
+                     </div>
+                  </div>
+               </div>
+               <p class="card-text">
+               <div class="row justify-content-center collapse" id="edit_<%= list._id %>">
+                  <div class="col text-black">
+                     <div class="card">
+                        <div class="card-body">
+                           <form class="form-horizontal updateList" id="" method="" action="">
+                              <input type="hidden" class="form-control" name="id" id="id" value="<%= list._id %>"/>
+                              <div class="form-group">
+                                 <label for="listName" class="control-label">List name</label>
+                                 <input type="text" class="form-control" name="listName" id="listName" value="<%= list.listName %>"/>
+                              </div>
+                              <div class="form-group">
+                                 <label for="description" class="control-label">Description</label>
+                                 <textarea class="form-control" name="listDesc"><%= list.listDesc %></textarea>
+                              </div>
+                              <div class="form-group">
+                                 <button type="submit" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#edit_<%= list._id %>">Update</button>
+                                 <a class="btn btn-danger" data-bs-toggle="collapse" data-bs-target="#edit_<%= list._id %>">Cancel</a>
+                              </div>
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="collapse" id="collapseTasks_<%= list._id %>">
+                  <p class="listDesc" style="white-space: pre-wrap;"><%= list.listDesc %></p>
+                  <a class="btn btn-success btn-sm m-1" data-bs-toggle="collapse" data-bs-target="#addTask_<%= list._id%>">Add Task</a>
+                  <div class="row justify-content-center collapse" id="addTask_<%= list._id%>">
+                     <div class="col text-black">
+                        <div class="card">
+                           <div class="card-body">
+                              <form class="form-horizontal addTask" id="" method="" action="">
+                                 <input type="hidden" class="form-control" name="id" id="id" value="<%= list._id %>"/>
+                                 <div class="form-group">
+                                    <label for="taskName" class="control-label">Task name</label>
+                                    <input type="text" class="form-control" name="taskName" id="taskName" placeholder="Task"/>
+                                 </div>
+                                 <div class="form-group">
+                                    <label for="taskDesc" class="control-label">Description</label>
+                                    <textarea class="form-control" name="taskDesc" id="taskDesc" placeholder="This is task description."></textarea>
+                                 </div>
+                                 <div class="form-group">
+                                    <label for="taskDateWarn" class="control-label">Warning date</label>
+                                    <input type="datetime-local" class="form-control" name="taskDateWarn" id="taskDateWarn">
+                                 </div>
+                                 <div class="form-group">
+                                    <label for="taskDateEnd" class="control-label">Expiration date</label>
+                                    <input type="datetime-local" class="form-control" name="taskDateEnd" id="taskDateEnd">
+                                 </div>
+                                 <div class="form-group">
+                                    <label for="taskListOfTags" class="control-label">Tags</label>
+                                    <div class="tags">
+                                       <input type="text" class="form-control" name="taskListOfTags[]" id="taskListOfTags" placeholder="Tag"/>
+                                    </div>
+                                    <a class="btn btn-success btn-sm m-1" onclick="addTagFormT(this)">Add tag</a>
+                                 </div>
+                                 <div class="form-group ">
+                                    <button type="submit" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#addTask_<%= list._id%>">Add</button>
+                                    <a class="btn btn-danger" data-bs-toggle="collapse" data-bs-target="#addTask_<%= list._id%>">Cancel</a>
+                                 </div>
+                              </form>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <ul class="list-group">
+                     <% list.listTasks.forEach(function(task){%>
+                     <li class="list-group-item <% if(task.taskStatus){ %>text-decoration-line-through<% } %>">
+                        <div class="card bg-light text-black <% if((task.taskDateWarn<new Date()) && !task.taskStatus){ %>border border-danger<% } %>">
+                           <div class="card-body">
+                              <div class="row">
+                                 <div class="col-3">
+                                    <h3><%= task.taskName %></h3>
+                                 </div>
+                                 <div class="col tagList">
+                                    <% task.taskListOfTags.forEach(function(tag){ %>
+                                    <span class="badge bg-primary rounded-pill m-1 fs-5"><%= tag.tag %><a class="btn btn-danger btn-sm" id="<%= list._id %>,<%= task._id %>,<%= tag._id %>" onclick="rmTagFromTask(this)"><i class="fas fa-remove"></i></a></span>
+                                    <% }); %>
+                                 </div>
+                                 <div class="col-4 d-flex justify-content-end align-items-center">
+                                    <div class="input-group m-1">
+                                       <input type="text" class="form-control" placeholder="NewTag" id="taskNewTag">
+                                       <button class="btn btn-primary" type="button" id="<%= list._id %>,<%= task._id %>" onclick="addTagToTask(this)"><span class="fas fa-plus"></span></button>
+                                    </div>
+                                    <a class="btn btn-secondary m-1" onclick="toggleIcon(this)" data-bs-toggle="collapse" data-bs-target="#collapseDesc_<%= task._id %>">
+                                    <span class="fas fa-arrow-circle-down"></span>
+                                    </a>
+                                    <a class="btn btn-success m-1" data-bs-toggle="collapse" data-bs-target="#edit_<%= task._id %>">
+                                    <span class="fas fa-edit"></span>
+                                    </a>
+                                    <% if(task.taskStatus){ %>
+                                    <a class="btn btn-success m-1 changeStatus" id="<%= list._id %>,<%= task._id %>" onclick="changeStatusT(this)">
+                                    <span class="fas fa-check-square"></span>
+                                    </a>
+                                    <% }else{ %>
+                                    <a class="btn btn-danger m-1 changeStatus" id="<%= list._id %>,<%= task._id %>" onclick="changeStatusT(this)">
+                                       <span class="fas fa-square"></span>
+                                    </a>
+                                    <% } %>
+                                    <a class="btn btn-danger m-1" id="<%= list._id %>,<%= task._id %>" onclick="removeTask(this)">
+                                    <span class="fas fa-remove"></span>
+                                    </a>
+                                 </div>
+                              </div>
+                              <div class="row justify-content-center collapse" id="edit_<%= task._id %>">
+                                 <div class="col text-black">
+                                    <div class="card">
+                                       <div class="card-body">
+                                          <form class="form-horizontal updateTask" id="" method="" action="">
+                                             <input type="hidden" class="form-control" name="id" id="id" value="<%= list._id %>"/>
+                                             <input type="hidden" class="form-control" name="idT" id="idT" value="<%= task._id %>"/>
+                                             <div class="form-group">
+                                                <label for="taskName" class="control-label">Task name</label>
+                                                <input type="text" class="form-control" name="taskName" id="taskName" value="<%= task.taskName %>"/>
+                                             </div>
+                                             <div class="form-group">
+                                                <label for="taskDesc" class="control-label">Description</label>
+                                                <textarea class="form-control" id="taskDesc" name="taskDesc"><%= task.taskDesc %></textarea>
+                                             </div>
+                                             <div class="form-group">
+                                                <button type="submit" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#edit_<%= task._id %>">Update</button>
+                                                <a class="btn btn-danger" data-bs-toggle="collapse" data-bs-target="#edit_<%= task._id %>">Cancel</a>
+                                             </div>
+                                          </form>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="collapse" id="collapseDesc_<%= task._id %>">
+                                 <p class="card-text taskDesc" style="white-space: pre-wrap;"><%= task.taskDesc %></p>
+                                 <p class="card-text">
+                                 <div class="row">
+                                    <div class="col">
+                                       <label class="control-label" id="<%= task._id %>_W">Warning date:<%= task.taskDateWarn.toUTCString() %></label>
+                                       <form class="form-vertical changeDateWarn" id="" method="" action="">
+                                          <div class="col form-control bg-light border-0 input-group align-items-start justify-content-start">
+                                             <input class="" type="datetime-local" name="taskDateWarn" id="taskDateWarn">
+                                             <input type="hidden" class="form-control" name="id" id="id" value="<%= list._id %>"/>
+                                             <input type="hidden" class="form-control" name="idT" id="idT" value="<%= task._id %>"/>
+                                             <button type="submit" class="btn btn-primary btn-sm">
+                                             <span class="fas fa-edit">Set</span>
+                                             </button>
+                                          </div>
+                                       </form>
+                                    </div>
+                                    <div class="col">
+                                       <label class="control-label" id="<%= task._id %>_E">Expiration date:<%= task.taskDateEnd.toUTCString() %></label>
+                                       <form class="form-vertical changeDateEnd" id="" method="" action="">
+                                          <div class="col form-control bg-light border-0 input-group align-items-start justify-content-start"> 
+                                             <input class="" type="datetime-local" name="taskDateEnd" id="taskDateEnd">
+                                             <input type="hidden" class="form-control" name="id" id="id" value="<%= list._id %>"/>
+                                             <input type="hidden" class="form-control" name="idT" id="idT" value="<%= task._id %>"/>
+                                             <button type="submit" class="btn btn-primary btn-sm">
+                                             <span class="fas fa-edit">Set</span>
+                                             </button>
+                                          </div>
+                                       </form>
+                                    </div>
+                                 </div>
+                                 </p>
+                              </div>
+                           </div>
+                        </div>
+                     </li>
+                     <% }); %>
+                  </ul>
+               </div>
+            </div>
+            </p>
+         </div>
+      </li>
+      <% }); %>
+   </ul>
+</div>
+<script type="text/javascript" src="/javascripts/script.js"></script>
+<%- include("layoutBottom.ejs"); %>
